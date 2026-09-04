@@ -6,6 +6,7 @@ import type { SurveyDetail } from "@/lib/supabase/queries/survey-detail";
 import { buildAnswersSchema, type AnswersByQuestionId } from "@/lib/validation/survey-response";
 import { QuestionField } from "./question-field";
 import { submitSurveyResponse } from "./actions";
+import { primaryButtonClass, secondaryButtonClass } from "@/lib/ui";
 
 type Phase = "intro" | "questions" | "success";
 
@@ -95,7 +96,7 @@ export function SurveyRunner({ survey }: { survey: SurveyDetail }) {
         <button
           type="button"
           onClick={() => setPhase("questions")}
-          className="mt-8 rounded-md bg-zinc-900 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          className={`mt-8 ${primaryButtonClass}`}
         >
           Start Survey
         </button>
@@ -114,10 +115,7 @@ export function SurveyRunner({ survey }: { survey: SurveyDetail }) {
             {survey.completionDescription}
           </p>
         ) : null}
-        <Link
-          href="/"
-          className="mt-8 inline-block rounded-md border border-zinc-300 px-6 py-2.5 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-50 dark:hover:bg-zinc-900"
-        >
+        <Link href="/" className={`mt-8 inline-block ${secondaryButtonClass}`}>
           Back to Home
         </Link>
       </div>
@@ -143,7 +141,7 @@ export function SurveyRunner({ survey }: { survey: SurveyDetail }) {
           className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800"
         >
           <div
-            className="h-full rounded-full bg-zinc-900 transition-all dark:bg-zinc-50"
+            className="h-full rounded-full bg-primary transition-all"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -181,7 +179,7 @@ export function SurveyRunner({ survey }: { survey: SurveyDetail }) {
           type="button"
           onClick={handlePrevious}
           disabled={stepIndex === 0 || isPending}
-          className="rounded-md border border-zinc-300 px-5 py-2.5 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-100 disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-50 dark:hover:bg-zinc-900"
+          className={secondaryButtonClass}
         >
           Previous
         </button>
@@ -189,7 +187,7 @@ export function SurveyRunner({ survey }: { survey: SurveyDetail }) {
           type="button"
           onClick={isLastStep ? handleSubmit : handleNext}
           disabled={isPending}
-          className="rounded-md bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-60 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          className={primaryButtonClass}
         >
           {isPending ? "Submitting…" : isLastStep ? "Submit Survey" : "Next"}
         </button>

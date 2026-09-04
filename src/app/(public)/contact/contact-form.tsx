@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { submitCustomerCareRequest, type ContactActionState } from "./actions";
 import { customerCareCategories } from "@/lib/validation/public";
+import { inputClass, primaryButtonClass } from "@/lib/ui";
 
 const initialState: ContactActionState = { status: "idle" };
 
@@ -48,7 +49,7 @@ export function ContactForm() {
           name="name"
           type="text"
           required
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+          className={inputClass}
         />
       </div>
 
@@ -61,7 +62,7 @@ export function ContactForm() {
           name="email"
           type="email"
           required
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+          className={inputClass}
         />
       </div>
 
@@ -73,7 +74,7 @@ export function ContactForm() {
           id="category"
           name="category"
           defaultValue="general"
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+          className={inputClass}
         >
           {customerCareCategories.map((category) => (
             <option key={category} value={category}>
@@ -92,7 +93,7 @@ export function ContactForm() {
           name="message"
           rows={5}
           required
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+          className={inputClass}
         />
       </div>
 
@@ -105,7 +106,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="mt-2 self-start rounded-md bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-60 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+        className={`mt-2 self-start ${primaryButtonClass}`}
       >
         {isPending ? "Sending…" : "Send Message"}
       </button>

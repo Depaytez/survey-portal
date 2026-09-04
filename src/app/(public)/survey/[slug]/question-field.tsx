@@ -2,9 +2,10 @@
 
 import type { SurveyQuestion } from "@/lib/supabase/queries/survey-detail";
 import type { AnswerValue } from "@/lib/validation/survey-response";
+import { inputClass } from "@/lib/ui";
 
-const inputClass =
-  "rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50";
+const optionCardClass =
+  "flex cursor-pointer items-start gap-2 rounded-md border border-zinc-200 p-3 text-sm has-checked:border-primary has-checked:bg-primary/10 dark:border-zinc-800";
 
 export function QuestionField({
   question,
@@ -67,7 +68,7 @@ export function QuestionField({
           {question.options.map((option) => (
             <label
               key={option.id}
-              className="flex cursor-pointer items-start gap-2 rounded-md border border-zinc-200 p-3 text-sm has-[:checked]:border-zinc-900 has-[:checked]:bg-zinc-50 dark:border-zinc-800 dark:has-[:checked]:border-zinc-50 dark:has-[:checked]:bg-zinc-900"
+              className={optionCardClass}
             >
               <input
                 type="radio"
@@ -97,7 +98,7 @@ export function QuestionField({
           {question.options.map((option) => (
             <label
               key={option.id}
-              className="flex cursor-pointer flex-col items-center gap-1 rounded-md border border-zinc-200 px-4 py-2 text-sm has-[:checked]:border-zinc-900 has-[:checked]:bg-zinc-50 dark:border-zinc-800 dark:has-[:checked]:border-zinc-50 dark:has-[:checked]:bg-zinc-900"
+              className="flex cursor-pointer flex-col items-center gap-1 rounded-md border border-zinc-200 px-4 py-2 text-sm has-checked:border-primary has-checked:bg-primary/10 dark:border-zinc-800"
             >
               <input
                 type="radio"
@@ -130,7 +131,7 @@ export function QuestionField({
             return (
               <label
                 key={option.id}
-                className="flex cursor-pointer items-start gap-2 rounded-md border border-zinc-200 p-3 text-sm has-[:checked]:border-zinc-900 has-[:checked]:bg-zinc-50 dark:border-zinc-800 dark:has-[:checked]:border-zinc-50 dark:has-[:checked]:bg-zinc-900 has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50"
+                className={`${optionCardClass} has-disabled:cursor-not-allowed has-disabled:opacity-50`}
               >
                 <input
                   type="checkbox"

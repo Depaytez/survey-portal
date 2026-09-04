@@ -6,6 +6,7 @@ import {
   type StakeholderActionState,
 } from "./actions";
 import { stakeholderInterestTypes } from "@/lib/validation/public";
+import { inputClass, primaryButtonClass } from "@/lib/ui";
 
 const initialState: StakeholderActionState = { status: "idle" };
 
@@ -56,7 +57,7 @@ export function StakeholderForm() {
           name="organizationName"
           type="text"
           required
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+          className={inputClass}
         />
       </div>
 
@@ -72,7 +73,7 @@ export function StakeholderForm() {
           name="contactName"
           type="text"
           required
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+          className={inputClass}
         />
       </div>
 
@@ -86,7 +87,7 @@ export function StakeholderForm() {
             name="email"
             type="email"
             required
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+            className={inputClass}
           />
         </div>
 
@@ -98,7 +99,7 @@ export function StakeholderForm() {
             id="phone"
             name="phone"
             type="tel"
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+            className={inputClass}
           />
         </div>
       </div>
@@ -114,7 +115,7 @@ export function StakeholderForm() {
           id="interestType"
           name="interestType"
           defaultValue="general_inquiry"
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+          className={inputClass}
         >
           {stakeholderInterestTypes.map((type) => (
             <option key={type} value={type}>
@@ -133,7 +134,7 @@ export function StakeholderForm() {
           name="message"
           rows={5}
           required
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+          className={inputClass}
         />
       </div>
 
@@ -146,7 +147,7 @@ export function StakeholderForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="mt-2 self-start rounded-md bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-60 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+        className={`mt-2 self-start ${primaryButtonClass}`}
       >
         {isPending ? "Submitting…" : "Submit Interest"}
       </button>

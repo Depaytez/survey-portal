@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getListedPublicSurveys } from "@/lib/supabase/queries/surveys";
+import { primaryButtonClass, secondaryButtonClass } from "@/lib/ui";
 
 export default async function Home() {
   const surveys = await getListedPublicSurveys();
@@ -8,7 +9,7 @@ export default async function Home() {
     <main>
       {/* Hero */}
       <section className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-20 text-center sm:py-28">
-        <p className="text-sm font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-500">
+        <p className="text-sm font-semibold uppercase tracking-wide text-accent">
           African Tourism Research Initiative
         </p>
         <h1 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-5xl dark:text-zinc-50">
@@ -22,16 +23,10 @@ export default async function Home() {
           Nigeria.
         </p>
         <div className="mx-auto flex flex-col gap-3 sm:flex-row">
-          <Link
-            href="#participate"
-            className="rounded-md bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
-          >
+          <Link href="#participate" className={primaryButtonClass}>
             Take the Survey
           </Link>
-          <Link
-            href="/stakeholder-interest"
-            className="rounded-md border border-zinc-300 px-5 py-2.5 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-50 dark:hover:bg-zinc-900"
-          >
+          <Link href="/stakeholder-interest" className={secondaryButtonClass}>
             Partner With Us
           </Link>
         </div>
@@ -112,7 +107,7 @@ export default async function Home() {
                   )}
                   <Link
                     href={`/survey/${survey.slug}`}
-                    className="text-sm font-medium text-zinc-900 underline underline-offset-2 dark:text-zinc-50"
+                    className="text-sm font-medium text-primary underline underline-offset-2"
                   >
                     Take the survey
                   </Link>
@@ -135,7 +130,7 @@ export default async function Home() {
             </p>
             <Link
               href="/contact"
-              className="mt-4 inline-block text-sm font-medium text-zinc-900 underline underline-offset-2 dark:text-zinc-50"
+              className="mt-4 inline-block text-sm font-medium text-primary underline underline-offset-2"
             >
               Contact us
             </Link>
@@ -150,7 +145,7 @@ export default async function Home() {
             </p>
             <Link
               href="/stakeholder-interest"
-              className="mt-4 inline-block text-sm font-medium text-zinc-900 underline underline-offset-2 dark:text-zinc-50"
+              className="mt-4 inline-block text-sm font-medium text-primary underline underline-offset-2"
             >
               Get in touch
             </Link>

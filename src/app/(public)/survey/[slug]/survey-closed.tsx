@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { secondaryButtonClass } from "@/lib/ui";
 
 export function SurveyClosed({ title }: { title: string }) {
   return (
@@ -9,10 +10,7 @@ export function SurveyClosed({ title }: { title: string }) {
         you to everyone who took part — your input helps shape better
         tourism experiences across Africa.
       </p>
-      <Link
-        href="/"
-        className="mt-8 inline-block rounded-md border border-zinc-300 px-6 py-2.5 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-50 dark:hover:bg-zinc-900"
-      >
+      <Link href="/" className={`mt-8 inline-block ${secondaryButtonClass}`}>
         Back to Home
       </Link>
     </div>

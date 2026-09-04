@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSurveyForAdmin } from "@/lib/supabase/queries/survey-admin";
 import { StatusBadge } from "../status-badge";
@@ -20,13 +21,24 @@ export default async function AdminSurveyDetailPage({
 
   return (
     <div className="mx-auto max-w-3xl">
-      <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">{survey.title}</h1>
-        <StatusBadge status={survey.status} />
+      <Link
+        href="/admin/surveys"
+        className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+      >
+        ← Back to Surveys
+      </Link>
+
+      {/* Solid card, not the ambient background — StatusBadge's tinted fill
+          only guarantees WCAG contrast against an opaque surface. */}
+      <div className="mt-3 rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">{survey.title}</h1>
+          <StatusBadge status={survey.status} />
+        </div>
+        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+          {survey.responseCount} response{survey.responseCount === 1 ? "" : "s"}
+        </p>
       </div>
-      <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-        {survey.responseCount} response{survey.responseCount === 1 ? "" : "s"}
-      </p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <SurveyStatusControl surveyId={survey.id} status={survey.status} />

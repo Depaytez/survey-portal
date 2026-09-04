@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getDashboardStats } from "@/lib/supabase/queries/survey-admin";
+import { secondaryButtonClass } from "@/lib/ui";
 
 function StatCard({ label, value }: { label: string; value: number }) {
   return (
@@ -48,10 +49,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       <div className="mt-8">
-        <Link
-          href="/admin/surveys"
-          className="text-sm font-medium text-primary underline underline-offset-2"
-        >
+        <Link href="/admin/surveys" className={secondaryButtonClass}>
           Manage surveys →
         </Link>
       </div>

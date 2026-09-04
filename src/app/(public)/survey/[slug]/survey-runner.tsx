@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import type { SurveyDetail } from "@/lib/supabase/queries/survey-detail";
 import { buildAnswersSchema, type AnswersByQuestionId } from "@/lib/validation/survey-response";
@@ -21,6 +21,14 @@ export function SurveyRunner({ survey }: { survey: SurveyDetail }) {
   const sections = survey.sections;
   const currentSection = sections[stepIndex];
   const isLastStep = stepIndex === sections.length - 1;
+
+  // Keeps a long question list from leaving the respondent scrolled deep
+  // into the previous step after Next/Previous — matches instant/no motion
+  // for users who've asked for reduced motion.
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? "auto" : "smooth" });
+  }, [phase, stepIndex]);
 
   function setAnswer(questionId: string, value: AnswersByQuestionId[string]) {
     setAnswers((prev) => ({ ...prev, [questionId]: value }));

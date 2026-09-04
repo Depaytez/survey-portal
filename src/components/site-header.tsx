@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandMark } from "./brand-mark";
 
 const NAV_LINKS = [
   { href: "/#participate", label: "Take the Survey" },
@@ -8,14 +9,9 @@ const NAV_LINKS = [
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-10 bg-background/85 backdrop-blur-md">
+    <header className="sticky top-0 z-10 border-b border-zinc-200 bg-background dark:border-zinc-800">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-6 py-4">
-        <Link
-          href="/"
-          className="text-sm font-semibold text-zinc-900 dark:text-zinc-50"
-        >
-          African Tourism Research Platform
-        </Link>
+        <BrandMark />
         <nav aria-label="Primary" className="flex flex-wrap items-center gap-x-6 gap-y-2">
           {NAV_LINKS.map((link) => (
             <Link

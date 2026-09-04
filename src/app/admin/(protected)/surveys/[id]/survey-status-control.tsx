@@ -14,6 +14,23 @@ const TRANSITION_LABELS: Record<SurveyStatus, string> = {
   ARCHIVED: "Archive",
 };
 
+// Only the consequential, hard-to-casually-undo transitions get a
+// confirmation — HIDDEN <-> PUBLISHED is a routine visibility toggle and
+// doesn't need one, so this is keyed by the exact (from, to) pair rather
+// than just the destination status.
+function confirmMessageFor(from: SurveyStatus, to: SurveyStatus): string | null {
+  if (from === "DRAFT" && to === "PUBLISHED") {
+    return "Publish this survey? It becomes publicly accessible immediately.";
+  }
+  if (to === "CLOSED") {
+    return "Close this survey? It will stop accepting new responses.";
+  }
+  if (to === "ARCHIVED") {
+    return "Archive this survey? This is the final state — there's no transition back out.";
+  }
+  return null;
+}
+
 export function SurveyStatusControl({
   surveyId,
   status,
@@ -26,6 +43,9 @@ export function SurveyStatusControl({
   const nextOptions = ALLOWED_STATUS_TRANSITIONS[status];
 
   function handleTransition(nextStatus: SurveyStatus) {
+    const confirmMessage = confirmMessageFor(status, nextStatus);
+    if (confirmMessage && !confirm(confirmMessage)) return;
+
     setError(null);
     startTransition(async () => {
       const result = await updateSurveyStatus(surveyId, status, nextStatus);

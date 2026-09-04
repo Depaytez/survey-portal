@@ -3,10 +3,7 @@
 import { useState } from "react";
 import { createOption, updateOption, deleteOption, moveOption, type ActionResult } from "./actions";
 import type { SurveyOption } from "@/lib/supabase/queries/survey-detail";
-import { inputClass } from "@/lib/ui";
-
-const iconButtonClass =
-  "rounded border border-zinc-300 px-2 py-1 text-xs font-medium text-zinc-700 hover:bg-zinc-100 disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800";
+import { inputClass, iconButtonClass } from "@/lib/ui";
 
 function OptionForm({
   surveyId,

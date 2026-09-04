@@ -10,11 +10,8 @@ import {
 } from "./actions";
 import { questionTypes, questionTypeNeedsOptions, type QuestionType } from "@/lib/validation/survey-admin";
 import type { SurveyQuestion } from "@/lib/supabase/queries/survey-detail";
-import { inputClass } from "@/lib/ui";
+import { inputClass, iconButtonClass } from "@/lib/ui";
 import { OptionRow, OptionForm } from "./option-row";
-
-const iconButtonClass =
-  "rounded border border-zinc-300 px-2 py-1 text-xs font-medium text-zinc-700 hover:bg-zinc-100 disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800";
 
 const TYPE_LABELS: Record<QuestionType, string> = {
   short_text: "Short text",

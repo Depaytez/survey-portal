@@ -454,7 +454,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_survey_question_distributions: {
+        Args: { p_survey_id: string }
+        Returns: {
+          answer_count: number
+          question_id: string
+          value: string
+        }[]
+      }
+      get_survey_response_trend: {
+        Args: { p_days: number; p_survey_id: string }
+        Returns: {
+          day: string
+          response_count: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

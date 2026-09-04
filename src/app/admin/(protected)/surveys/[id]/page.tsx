@@ -6,6 +6,7 @@ import { SurveySharing } from "./survey-sharing";
 import { SurveyStatusControl } from "./survey-status-control";
 import { SurveyDetailsForm } from "./survey-details-form";
 import { SurveyBuilder } from "./survey-builder";
+import { secondaryButtonClass } from "@/lib/ui";
 
 export default async function AdminSurveyDetailPage({
   params,
@@ -35,9 +36,27 @@ export default async function AdminSurveyDetailPage({
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">{survey.title}</h1>
           <StatusBadge status={survey.status} />
         </div>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          {survey.responseCount} response{survey.responseCount === 1 ? "" : "s"}
-        </p>
+        <div className="mt-2 flex flex-wrap items-center gap-3">
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            {survey.responseCount} response{survey.responseCount === 1 ? "" : "s"}
+          </p>
+          {survey.responseCount > 0 ? (
+            <div className="flex gap-2">
+              <Link
+                href={`/admin/surveys/${survey.id}/responses`}
+                className={`${secondaryButtonClass} px-3 py-1 text-xs`}
+              >
+                View Responses
+              </Link>
+              <Link
+                href={`/admin/surveys/${survey.id}/analytics`}
+                className={`${secondaryButtonClass} px-3 py-1 text-xs`}
+              >
+                View Analytics
+              </Link>
+            </div>
+          ) : null}
+        </div>
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">

@@ -9,9 +9,9 @@ export default async function Home() {
     <main>
       {/* Hero */}
       <section className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-20 text-center sm:py-28">
-        <p className="text-sm font-semibold uppercase tracking-wide text-accent">
+        <span className="mx-auto inline-flex items-center rounded-full bg-background px-3 py-1 text-sm font-semibold uppercase tracking-wide text-accent shadow-sm">
           African Tourism Research Initiative
-        </p>
+        </span>
         <h1 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-5xl dark:text-zinc-50">
           Understanding what travelers want from Africa
         </h1>
@@ -33,7 +33,7 @@ export default async function Home() {
       </section>
 
       {/* Purpose */}
-      <section className="border-t border-zinc-200 dark:border-zinc-800">
+      <section>
         <div className="mx-auto grid max-w-5xl gap-4 px-6 py-16 sm:grid-cols-3">
           <div className="rounded-lg border border-zinc-200 bg-background/85 p-5 backdrop-blur-sm dark:border-zinc-800">
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">

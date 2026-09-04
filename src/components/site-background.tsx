@@ -1,9 +1,10 @@
 import Image from "next/image";
+import { AnkaraMotifs } from "./ankara-motifs";
 
 /**
  * A fixed, viewport-covering, purely decorative background image with a
- * translucent scrim on top — the whole public site's content scrolls over
- * it.
+ * translucent scrim (and a few minimal floating accent shapes) on top —
+ * the whole public site's content scrolls over it.
  *
  * Implementation notes:
  * - Uses `position: fixed` on the wrapper, NOT the CSS `background-attachment:
@@ -13,12 +14,19 @@ import Image from "next/image";
  *   consistently across browsers and devices.
  * - `aria-hidden` + `alt=""`: the image is decorative, not informational —
  *   screen readers should skip it entirely (WCAG 1.1.1).
- * - The overlay (`bg-background/85`) reuses the same light/dark background
+ * - The overlay (`bg-background/70`) reuses the same light/dark background
  *   token as the rest of the site, so it automatically "fogs" the photo
  *   white in light mode / dark in dark mode. This is the same technique
  *   W3C's own guidance (WCAG Technique G18) gives as the standard way to
  *   guarantee text-over-image contrast: lighten/darken the image behind
  *   text rather than relying on the photo's own unpredictable content.
+ *   70% was chosen deliberately (not a stronger, safer-looking 85%+): it's
+ *   the lowest opacity that still keeps body text (zinc-600 and darker)
+ *   comfortably above the 4.5:1 WCAG AA minimum even in the theoretical
+ *   worst case of a pure-black pixel directly behind the text — anything
+ *   lighter than ~56% starts cutting into that margin. Text elements that
+ *   need a guaranteed-safe surface regardless (forms, cards) sit on
+ *   `panelClass` instead, which is more opaque still.
  */
 export function SiteBackground() {
   return (
@@ -31,7 +39,8 @@ export function SiteBackground() {
         sizes="100vw"
         className="object-cover"
       />
-      <div className="absolute inset-0 bg-background/85" />
+      <div className="absolute inset-0 bg-background/70" />
+      <AnkaraMotifs />
     </div>
   );
 }

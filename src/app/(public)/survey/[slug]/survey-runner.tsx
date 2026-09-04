@@ -1,0 +1,199 @@
+"use client";
+
+import { useState, useTransition } from "react";
+import Link from "next/link";
+import type { SurveyDetail } from "@/lib/supabase/queries/survey-detail";
+import { buildAnswersSchema, type AnswersByQuestionId } from "@/lib/validation/survey-response";
+import { QuestionField } from "./question-field";
+import { submitSurveyResponse } from "./actions";
+
+type Phase = "intro" | "questions" | "success";
+
+export function SurveyRunner({ survey }: { survey: SurveyDetail }) {
+  const [phase, setPhase] = useState<Phase>("intro");
+  const [stepIndex, setStepIndex] = useState(0);
+  const [answers, setAnswers] = useState<AnswersByQuestionId>({});
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [formError, setFormError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  const sections = survey.sections;
+  const currentSection = sections[stepIndex];
+  const isLastStep = stepIndex === sections.length - 1;
+
+  function setAnswer(questionId: string, value: AnswersByQuestionId[string]) {
+    setAnswers((prev) => ({ ...prev, [questionId]: value }));
+    setFieldErrors((prev) => {
+      if (!(questionId in prev)) return prev;
+      const next = { ...prev };
+      delete next[questionId];
+      return next;
+    });
+  }
+
+  function validateStep(index: number): boolean {
+    const questions = sections[index].questions;
+    const schema = buildAnswersSchema(questions);
+    const result = schema.safeParse(answers);
+
+    if (result.success) {
+      setFieldErrors({});
+      return true;
+    }
+
+    const errors: Record<string, string> = {};
+    for (const issue of result.error.issues) {
+      errors[String(issue.path[0])] = issue.message;
+    }
+    setFieldErrors(errors);
+    return false;
+  }
+
+  function handleNext() {
+    setFormError(null);
+    if (!validateStep(stepIndex)) return;
+    setStepIndex((i) => Math.min(i + 1, sections.length - 1));
+  }
+
+  function handlePrevious() {
+    setFormError(null);
+    setFieldErrors({});
+    setStepIndex((i) => Math.max(i - 1, 0));
+  }
+
+  function handleSubmit() {
+    setFormError(null);
+    if (!validateStep(stepIndex)) return;
+
+    startTransition(async () => {
+      const result = await submitSurveyResponse(survey.slug, answers);
+      if (result.success) {
+        setPhase("success");
+        return;
+      }
+      setFormError(result.error);
+      if (result.fieldErrors) setFieldErrors(result.fieldErrors);
+    });
+  }
+
+  if (phase === "intro") {
+    return (
+      <div className="mx-auto max-w-xl px-6 py-16 text-center">
+        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
+          {survey.welcomeTitle ?? survey.title}
+        </h1>
+        {survey.welcomeDescription ? (
+          <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
+            {survey.welcomeDescription}
+          </p>
+        ) : null}
+        {survey.estimatedDuration ? (
+          <p className="mt-4 text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-500">
+            Estimated time: {survey.estimatedDuration}
+          </p>
+        ) : null}
+        <button
+          type="button"
+          onClick={() => setPhase("questions")}
+          className="mt-8 rounded-md bg-zinc-900 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+        >
+          Start Survey
+        </button>
+      </div>
+    );
+  }
+
+  if (phase === "success") {
+    return (
+      <div className="mx-auto max-w-xl px-6 py-16 text-center">
+        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
+          {survey.completionTitle ?? "Thank You!"}
+        </h1>
+        {survey.completionDescription ? (
+          <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
+            {survey.completionDescription}
+          </p>
+        ) : null}
+        <Link
+          href="/"
+          className="mt-8 inline-block rounded-md border border-zinc-300 px-6 py-2.5 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-50 dark:hover:bg-zinc-900"
+        >
+          Back to Home
+        </Link>
+      </div>
+    );
+  }
+
+  const progressPercent = Math.round(((stepIndex + 1) / sections.length) * 100);
+
+  return (
+    <div className="mx-auto max-w-xl px-6 py-12">
+      <div className="mb-6">
+        <div className="flex items-center justify-between text-xs font-medium text-zinc-500 dark:text-zinc-400">
+          <span>
+            Step {stepIndex + 1} of {sections.length}
+          </span>
+          <span>{progressPercent}%</span>
+        </div>
+        <div
+          role="progressbar"
+          aria-valuenow={progressPercent}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800"
+        >
+          <div
+            className="h-full rounded-full bg-zinc-900 transition-all dark:bg-zinc-50"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+      </div>
+
+      <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
+        {currentSection.title}
+      </h2>
+      {currentSection.description ? (
+        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+          {currentSection.description}
+        </p>
+      ) : null}
+
+      <div className="mt-6 flex flex-col gap-8">
+        {currentSection.questions.map((question) => (
+          <QuestionField
+            key={question.id}
+            question={question}
+            value={answers[question.id]}
+            onChange={(value) => setAnswer(question.id, value)}
+            error={fieldErrors[question.id]}
+          />
+        ))}
+      </div>
+
+      {formError ? (
+        <p role="alert" className="mt-6 text-sm text-red-600 dark:text-red-400">
+          {formError}
+        </p>
+      ) : null}
+
+      <div className="mt-8 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={handlePrevious}
+          disabled={stepIndex === 0 || isPending}
+          className="rounded-md border border-zinc-300 px-5 py-2.5 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-100 disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-50 dark:hover:bg-zinc-900"
+        >
+          Previous
+        </button>
+        <button
+          type="button"
+          onClick={isLastStep ? handleSubmit : handleNext}
+          disabled={isPending}
+          className="rounded-md bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-60 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+        >
+          {isPending ? "Submitting…" : isLastStep ? "Submit Survey" : "Next"}
+        </button>
+      </div>
+    </div>
+  );
+}

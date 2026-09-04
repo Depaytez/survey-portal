@@ -33,9 +33,9 @@ export default async function Home() {
       </section>
 
       {/* Purpose */}
-      <section className="border-t border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="mx-auto grid max-w-5xl gap-8 px-6 py-16 sm:grid-cols-3">
-          <div>
+      <section className="border-t border-zinc-200 dark:border-zinc-800">
+        <div className="mx-auto grid max-w-5xl gap-4 px-6 py-16 sm:grid-cols-3">
+          <div className="rounded-lg border border-zinc-200 bg-background/85 p-5 backdrop-blur-sm dark:border-zinc-800">
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
               Why this research matters
             </h2>
@@ -45,7 +45,7 @@ export default async function Home() {
               traveler expectations.
             </p>
           </div>
-          <div>
+          <div className="rounded-lg border border-zinc-200 bg-background/85 p-5 backdrop-blur-sm dark:border-zinc-800">
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
               What we&apos;re learning
             </h2>
@@ -55,7 +55,7 @@ export default async function Home() {
               and enjoy.
             </p>
           </div>
-          <div>
+          <div className="rounded-lg border border-zinc-200 bg-background/85 p-5 backdrop-blur-sm dark:border-zinc-800">
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
               How it&apos;s used
             </h2>
@@ -87,7 +87,7 @@ export default async function Home() {
             {surveys.map((survey) => (
               <li
                 key={survey.slug}
-                className="rounded-lg border border-zinc-200 p-5 dark:border-zinc-800"
+                className="rounded-lg border border-zinc-200 bg-background/85 p-5 backdrop-blur-sm dark:border-zinc-800"
               >
                 <h3 className="font-semibold text-zinc-900 dark:text-zinc-50">
                   {survey.shortTitle ?? survey.title}
@@ -99,7 +99,7 @@ export default async function Home() {
                 ) : null}
                 <div className="mt-4 flex items-center justify-between">
                   {survey.estimatedDuration ? (
-                    <span className="text-xs text-zinc-500 dark:text-zinc-500">
+                    <span className="text-xs text-zinc-600 dark:text-zinc-400">
                       {survey.estimatedDuration}
                     </span>
                   ) : (
@@ -121,7 +121,7 @@ export default async function Home() {
       {/* Get involved */}
       <section className="border-t border-zinc-200 dark:border-zinc-800">
         <div className="mx-auto grid max-w-5xl gap-6 px-6 py-16 sm:grid-cols-2">
-          <div className="rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
+          <div className="rounded-lg border border-zinc-200 bg-background/85 p-6 backdrop-blur-sm dark:border-zinc-800">
             <h2 className="font-semibold text-zinc-900 dark:text-zinc-50">
               Have a question or an issue?
             </h2>
@@ -135,7 +135,7 @@ export default async function Home() {
               Contact us
             </Link>
           </div>
-          <div className="rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
+          <div className="rounded-lg border border-zinc-200 bg-background/85 p-6 backdrop-blur-sm dark:border-zinc-800">
             <h2 className="font-semibold text-zinc-900 dark:text-zinc-50">
               Represent a tourism organization?
             </h2>

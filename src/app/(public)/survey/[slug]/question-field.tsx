@@ -36,7 +36,7 @@ export function QuestionField({
         ) : null}
       </legend>
       {question.description ? (
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">{question.description}</p>
+        <p className="text-sm text-zinc-600 dark:text-zinc-400">{question.description}</p>
       ) : null}
 
       {question.questionType === "short_text" || question.questionType === "email" ? (
@@ -83,7 +83,7 @@ export function QuestionField({
                   {option.label}
                 </span>
                 {option.description ? (
-                  <span className="block text-zinc-500 dark:text-zinc-400">
+                  <span className="block text-zinc-600 dark:text-zinc-400">
                     {option.description}
                   </span>
                 ) : null}
@@ -111,7 +111,7 @@ export function QuestionField({
               <span className="font-semibold text-zinc-900 dark:text-zinc-50">
                 {option.value}
               </span>
-              <span className="text-xs text-zinc-500 dark:text-zinc-400">{option.label}</span>
+              <span className="text-xs text-zinc-600 dark:text-zinc-400">{option.label}</span>
             </label>
           ))}
         </div>
@@ -120,7 +120,7 @@ export function QuestionField({
       {question.questionType === "multiple_choice" ? (
         <div className="flex flex-col gap-2">
           {maxSelections ? (
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            <p className="text-xs text-zinc-600 dark:text-zinc-400">
               Selected {selectedValues.length} of {maxSelections}
             </p>
           ) : null}
@@ -151,7 +151,7 @@ export function QuestionField({
                     {option.label}
                   </span>
                   {option.description ? (
-                    <span className="block text-zinc-500 dark:text-zinc-400">
+                    <span className="block text-zinc-600 dark:text-zinc-400">
                       {option.description}
                     </span>
                   ) : null}

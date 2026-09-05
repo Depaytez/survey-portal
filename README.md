@@ -229,6 +229,8 @@ src/
       forgot-password/  Public password-reset request
       set-password/     Where invite/reset email links land
       (protected)/      Everything else — dashboard, surveys, requests, admins (all require an admin session)
+        surveys/[id]/analytics/       Per-survey KPIs, trend chart, per-question breakdowns
+        surveys/[id]/analytics/export/  Route Handler — streams the raw responses as CSV
     auth/callback/      Exchanges invite/reset email links for a real session
   components/           Shared UI (site header/footer/background, brand mark)
   lib/
@@ -262,3 +264,9 @@ project uses a `src/` directory) and that `next build`'s output includes a
 "Proxy (Middleware)" line. Every protected page also independently calls
 `requireAdmin()`, so this is defense-in-depth, not the only gate — but it
 should still be registered correctly.
+
+**`supabase link` or `supabase db push` fails with `403` / "does not have
+the necessary privileges".** The CLI is authenticated to the wrong Supabase
+account — `npx supabase projects list` will confirm this by showing
+projects that aren't this one. Run `npx supabase login` to re-authenticate
+as the account that actually owns this project, then retry.

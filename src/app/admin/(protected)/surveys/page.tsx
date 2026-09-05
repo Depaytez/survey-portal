@@ -1,7 +1,20 @@
 import Link from "next/link";
 import { listSurveysForAdmin } from "@/lib/supabase/queries/survey-admin";
 import { StatusBadge } from "./status-badge";
-import { primaryButtonClass } from "@/lib/ui";
+import { primaryButtonClass, iconButtonClass } from "@/lib/ui";
+
+function VisualizeIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className="h-4 w-4">
+      <path
+        d="M4 15.5V8M10 15.5V4.5M16 15.5v-5"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
 
 export default async function AdminSurveysPage() {
   const surveys = await listSurveysForAdmin();
@@ -26,11 +39,11 @@ export default async function AdminSurveysPage() {
           {/* Card list on small screens */}
           <ul className="mt-6 flex flex-col gap-3 sm:hidden">
             {surveys.map((survey) => (
-              <li key={survey.id}>
-                <Link
-                  href={`/admin/surveys/${survey.id}`}
-                  className="block rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950"
-                >
+              <li
+                key={survey.id}
+                className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950"
+              >
+                <Link href={`/admin/surveys/${survey.id}`} className="block">
                   <div className="flex items-start justify-between gap-2">
                     <span className="font-medium text-zinc-900 dark:text-zinc-50">
                       {survey.title}
@@ -44,10 +57,22 @@ export default async function AdminSurveysPage() {
                     </span>
                     <span>{new Date(survey.updatedAt).toLocaleDateString()}</span>
                   </div>
-                  <span className="mt-3 block text-right text-xs font-medium text-primary">
-                    Open →
-                  </span>
                 </Link>
+                <div className="mt-3 flex items-center justify-end gap-2 border-t border-zinc-100 pt-3 dark:border-zinc-800">
+                  <Link
+                    href={`/admin/surveys/${survey.id}/analytics`}
+                    className={`${iconButtonClass} gap-1.5 px-3 text-primary`}
+                  >
+                    <VisualizeIcon />
+                    Visualize
+                  </Link>
+                  <Link
+                    href={`/admin/surveys/${survey.id}`}
+                    className="text-xs font-medium text-primary hover:underline"
+                  >
+                    Open →
+                  </Link>
+                </div>
               </li>
             ))}
           </ul>
@@ -91,12 +116,22 @@ export default async function AdminSurveysPage() {
                       {new Date(survey.updatedAt).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <Link
-                        href={`/admin/surveys/${survey.id}`}
-                        className="text-xs font-medium text-primary hover:underline"
-                      >
-                        Open →
-                      </Link>
+                      <div className="flex items-center justify-end gap-3">
+                        <Link
+                          href={`/admin/surveys/${survey.id}/analytics`}
+                          title="Visualize responses"
+                          className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                        >
+                          <VisualizeIcon />
+                          Visualize
+                        </Link>
+                        <Link
+                          href={`/admin/surveys/${survey.id}`}
+                          className="text-xs font-medium text-primary hover:underline"
+                        >
+                          Open →
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ))}

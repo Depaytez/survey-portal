@@ -153,6 +153,13 @@ export type QuestionDistribution = {
  * metadata so the UI gets human-readable labels (not raw option values)
  * and each question's own recommended chart type from analytics_config.
  */
+// boolean questions have no question_options rows — their two buckets are
+// fixed, so they're synthesized here rather than stored.
+const BOOLEAN_OPTIONS = [
+  { value: "true", label: "Yes", display_order: 0 },
+  { value: "false", label: "No", display_order: 1 },
+];
+
 export async function getSurveyQuestionDistributions(
   surveyId: string,
 ): Promise<QuestionDistribution[]> {
@@ -167,7 +174,7 @@ export async function getSurveyQuestionDistributions(
           "id, title, question_type, display_order, analytics_config, question_options(value, label, display_order)",
         )
         .eq("survey_id", surveyId)
-        .in("question_type", ["single_choice", "multiple_choice", "rating"])
+        .in("question_type", ["single_choice", "multiple_choice", "rating", "boolean"])
         .order("display_order"),
     ]);
 
@@ -189,7 +196,9 @@ export async function getSurveyQuestionDistributions(
     const questionCounts = countsByQuestion.get(q.id) ?? new Map();
     const analyticsConfig = (q.analytics_config as Record<string, unknown>) ?? {};
 
-    const distribution = q.question_options
+    const options = q.question_type === "boolean" ? BOOLEAN_OPTIONS : q.question_options;
+
+    const distribution = options
       .slice()
       .sort((a, b) => a.display_order - b.display_order)
       .map((option) => ({
@@ -209,4 +218,98 @@ export async function getSurveyQuestionDistributions(
       distribution,
     };
   });
+}
+
+export type SurveyKpis = {
+  totalResponses: number;
+  today: number;
+  thisWeek: number;
+  lastResponseAt: string | null;
+};
+
+/**
+ * Cheap headline counts for the analytics overview strip. Deliberately
+ * skips "completion rate" / "average time to complete" — this survey's
+ * submission flow is a single atomic write (no partial/in-progress saves
+ * are ever persisted), so started_at and submitted_at are always
+ * effectively identical and would make those metrics meaningless, not
+ * just unavailable.
+ */
+export async function getSurveyKpis(surveyId: string): Promise<SurveyKpis> {
+  const supabase = await createClient();
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+  const startOfWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+  const [{ count: totalResponses }, { count: today }, { count: thisWeek }, { data: last }] =
+    await Promise.all([
+      supabase
+        .from("survey_responses")
+        .select("id", { count: "exact", head: true })
+        .eq("survey_id", surveyId)
+        .eq("status", "SUBMITTED"),
+      supabase
+        .from("survey_responses")
+        .select("id", { count: "exact", head: true })
+        .eq("survey_id", surveyId)
+        .eq("status", "SUBMITTED")
+        .gte("submitted_at", startOfToday),
+      supabase
+        .from("survey_responses")
+        .select("id", { count: "exact", head: true })
+        .eq("survey_id", surveyId)
+        .eq("status", "SUBMITTED")
+        .gte("submitted_at", startOfWeek),
+      supabase
+        .from("survey_responses")
+        .select("submitted_at")
+        .eq("survey_id", surveyId)
+        .eq("status", "SUBMITTED")
+        .order("submitted_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
+
+  return {
+    totalResponses: totalResponses ?? 0,
+    today: today ?? 0,
+    thisWeek: thisWeek ?? 0,
+    lastResponseAt: last?.submitted_at ?? null,
+  };
+}
+
+export type TextAnswer = { responseId: string; submittedAt: string | null; value: string };
+export type TextAnswersResult = { answers: TextAnswer[]; totalCount: number };
+
+/** Paginated free-text answers for one question — never all at once, same pagination discipline as getSurveyResponsesPaginated. */
+export async function getQuestionTextAnswers(
+  questionId: string,
+  page: number,
+  pageSize: number,
+): Promise<TextAnswersResult> {
+  const supabase = await createClient();
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  const { data, error, count } = await supabase
+    .from("response_answers")
+    .select("value, survey_responses!inner(id, submitted_at, status)", { count: "exact" })
+    .eq("question_id", questionId)
+    .eq("survey_responses.status", "SUBMITTED")
+    .order("submitted_at", { referencedTable: "survey_responses", ascending: false })
+    .range(from, to);
+
+  if (error) {
+    console.error(`Failed to load text answers for question ${questionId}:`, error.message);
+    return { answers: [], totalCount: 0 };
+  }
+
+  return {
+    answers: data.map((row) => ({
+      responseId: row.survey_responses.id,
+      submittedAt: row.survey_responses.submitted_at,
+      value: typeof row.value === "string" ? row.value : JSON.stringify(row.value),
+    })),
+    totalCount: count ?? 0,
+  };
 }

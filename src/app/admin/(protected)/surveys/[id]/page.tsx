@@ -40,22 +40,20 @@ export default async function AdminSurveyDetailPage({
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
             {survey.responseCount} response{survey.responseCount === 1 ? "" : "s"}
           </p>
-          {survey.responseCount > 0 ? (
-            <div className="flex gap-2">
-              <Link
-                href={`/admin/surveys/${survey.id}/responses`}
-                className={`${secondaryButtonClass} px-3 py-1 text-xs`}
-              >
-                View Responses
-              </Link>
-              <Link
-                href={`/admin/surveys/${survey.id}/analytics`}
-                className={`${secondaryButtonClass} px-3 py-1 text-xs`}
-              >
-                View Analytics
-              </Link>
-            </div>
-          ) : null}
+          <div className="flex gap-2">
+            <Link
+              href={`/admin/surveys/${survey.id}/responses`}
+              className={`${secondaryButtonClass} px-3 py-1 text-xs`}
+            >
+              View Responses
+            </Link>
+            <Link
+              href={`/admin/surveys/${survey.id}/analytics`}
+              className={`${secondaryButtonClass} px-3 py-1 text-xs`}
+            >
+              View Analytics
+            </Link>
+          </div>
         </div>
       </div>
 

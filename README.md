@@ -155,7 +155,35 @@ hour and isn't intended for production — the admin-invite and
 provider (Resend, Postmark, SES, etc.). Without this, invite/reset emails
 can silently fail to arrive once you exceed the default rate limit.
 
-### 3.5 Decide: shared or separate Supabase project for production
+### 3.5 Apply the branded, code-based email templates
+
+Admin invite and password-reset emails use a **6-to-10-digit code the
+person types in**, not a clickable link — email security scanners (Gmail,
+Microsoft Defender Safe Links, corporate mail gateways) "click" links to
+scan them, which silently burns a one-time link token before the real
+person ever sees it. A code has nothing for a scanner to consume. This
+also means the emails need custom templates that actually display the
+code (Supabase's default templates only show a link).
+
+The templates already exist in this repo — `supabase/templates/invite.html`
+and `supabase/templates/recovery.html`, branded to match the app — and
+`supabase/config.toml` already points to them. **They still need to be
+applied to your hosted project**, which this project deliberately doesn't
+automate: `supabase config push` pushes config.toml's `site_url` and
+`additional_redirect_urls` too, and this repo's config.toml has those set
+to local-dev placeholders — pushing as-is would overwrite your real
+production redirect settings. Instead, apply them by hand once:
+
+1. **Authentication → Email Templates → Invite user**: paste the subject
+   and body of `supabase/templates/invite.html`.
+2. **Authentication → Email Templates → Reset Password**: paste the
+   subject and body of `supabase/templates/recovery.html`.
+
+If you'd rather use `supabase config push` for this, first edit
+`[auth]` in `config.toml` so `site_url` and `additional_redirect_urls`
+match your real production values — otherwise the push will revert them.
+
+### 3.6 Decide: shared or separate Supabase project for production
 
 If you've been developing against a single Supabase project, consider
 creating a **separate production project** before going live, so local
@@ -165,12 +193,12 @@ testing never touches real respondent data. If you do this:
 2. Point Vercel's environment variables at the new project.
 3. Run `npm run create-admin` against it for the first production admin.
 
-### 3.6 Deploy
+### 3.7 Deploy
 
 Push to the branch Vercel is watching (or trigger a deploy manually). After
 it's live, run through the checklist below.
 
-### 3.7 Post-deploy verification checklist
+### 3.8 Post-deploy verification checklist
 
 - [ ] Public homepage loads (`/`)
 - [ ] `/admin/login` loads and you can sign in
@@ -181,8 +209,10 @@ it's live, run through the checklist below.
 - [ ] Submit a test entry on `/contact` and `/stakeholder-interest`, confirm
       it shows up under `/admin/customer-care` / `/admin/stakeholder-requests`
 - [ ] Send a real admin invite from `/admin/admins` to an email you control,
-      confirm the email arrives and the set-password flow completes
-- [ ] Try "Forgot password?" on `/admin/login`, confirm that email arrives too
+      confirm the branded email arrives with a code, and that entering it at
+      `/admin/accept-invite` activates the account
+- [ ] Try "Forgot password?" on `/admin/login`, confirm the code email
+      arrives and resetting via `/admin/forgot-password` works
 
 ---
 
@@ -226,19 +256,21 @@ src/
     (public)/          Public site — landing page, /contact, /stakeholder-interest, /survey/[slug]
     admin/
       login/            Public admin sign-in
-      forgot-password/  Public password-reset request
-      set-password/     Where invite/reset email links land
+      forgot-password/  Public password-reset request — code + new password, two steps on one page
+      accept-invite/    Public invite acceptance — code + new password, activates the account
+      set-password/     Legacy: destination for an old-style clicked invite/reset link, kept as a fallback
       (protected)/      Everything else — dashboard, surveys, requests, admins (all require an admin session)
         surveys/[id]/analytics/       Per-survey KPIs, trend chart, per-question breakdowns
         surveys/[id]/analytics/export/  Route Handler — streams the raw responses as CSV
-    auth/callback/      Exchanges invite/reset email links for a real session
-  components/           Shared UI (site header/footer/background, brand mark)
+    auth/callback/      Legacy: exchanges an old-style link's code for a session, kept as a fallback
+  components/           Shared UI (site header/footer/background, brand mark, otp-password-form)
   lib/
     supabase/           Client factories (browser/server/admin) + query modules
     validation/         Zod schemas + shared constants safe for both client and server code
   types/database.types.ts   Generated from the live schema — don't hand-edit
 supabase/
   migrations/           Every schema/RLS/function change, in order
+  templates/            Branded invite/recovery email HTML — see §3.5 to apply them
 scripts/
   create-admin.ts       Local-only admin provisioning script
 ```
@@ -252,10 +284,19 @@ the build succeeded.** Almost always missing environment variables in
 Vercel — see §3.2.
 
 **Admin invite or password-reset email never arrives.** Two possibilities:
-(1) if you invited an email that already has an account, no email is sent by
-design — the app tells you this in the success message; (2) Supabase's
-default mailer is rate-limited to a few emails/hour — configure custom SMTP
-for production (§3.4).
+(1) if you invited an email that already has a *confirmed* account, no
+email is sent by design — the app tells you this in the success message
+(a still-*pending* invitee can be resent one from `/admin/admins`); (2)
+Supabase's default mailer is rate-limited to a few emails/hour — configure
+custom SMTP for production (§3.4).
+
+**The invite/reset email arrived, but the code doesn't work / redirects to
+an error.** If the branded templates from §3.5 haven't been applied yet,
+Supabase's default template sends a clickable link instead of a code — and
+email security scanners (Gmail, Microsoft Defender Safe Links, corporate
+mail gateways) silently "click" that link to scan it before the real
+person does, burning the one-time token. Apply the templates in §3.5 so
+the email shows a code instead — nothing for a scanner to consume.
 
 **A protected `/admin/*` page doesn't redirect unauthenticated visitors.**
 Check that `src/proxy.ts` exists at that exact path (not the project root —

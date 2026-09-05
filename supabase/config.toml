@@ -242,10 +242,17 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
-# Uncomment to customize email template
-# [auth.email.template.invite]
-# subject = "You have been invited"
-# content_path = "./supabase/templates/invite.html"
+# Custom branded templates — both show the OTP code prominently instead of
+# a clickable confirmation link, so email security scanners (Gmail,
+# Microsoft Defender Safe Links, corporate mail gateways) that "click"
+# links to scan them can't burn the one-time token before a human sees it.
+[auth.email.template.invite]
+subject = "You're invited to African Tourism Research Platform"
+content_path = "./supabase/templates/invite.html"
+
+[auth.email.template.recovery]
+subject = "Reset your African Tourism Research Platform password"
+content_path = "./supabase/templates/recovery.html"
 
 # Uncomment to customize notification email template
 # [auth.email.notification.password_changed]

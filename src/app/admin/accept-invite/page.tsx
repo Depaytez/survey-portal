@@ -1,15 +1,14 @@
-import Link from "next/link";
-import { ForgotPasswordForm } from "./forgot-password-form";
 import { SiteBackground } from "@/components/site-background";
 import { BrandMark } from "@/components/brand-mark";
+import { OtpPasswordForm } from "@/components/otp-password-form";
 
-export default async function ForgotPasswordPage({
+export default async function AcceptInvitePage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const sp = await searchParams;
-  const initialEmail = typeof sp.email === "string" ? sp.email : "";
+  const email = typeof sp.email === "string" ? sp.email : "";
 
   return (
     <div className="relative flex min-h-screen flex-1 items-center justify-center px-4">
@@ -17,20 +16,20 @@ export default async function ForgotPasswordPage({
       <div className="w-full max-w-sm rounded-lg border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
         <BrandMark href="/" />
         <h1 className="mt-6 text-xl font-semibold text-zinc-900 dark:text-zinc-50">
-          Reset Your Password
+          Activate Your Admin Account
         </h1>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          {initialEmail
-            ? "Enter the code we emailed you and choose a new password."
-            : "Enter your email and we'll send you a code to reset your password."}
+          Enter the code from your invite email and choose a password.
         </p>
-        <ForgotPasswordForm initialEmail={initialEmail} />
-        <Link
-          href="/admin/login"
-          className="mt-6 block text-center text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
-        >
-          ← Back to sign in
-        </Link>
+        <div className="mt-6">
+          <OtpPasswordForm
+            type="invite"
+            defaultEmail={email}
+            redirectTo="/admin/dashboard"
+            codeLabel="Invite Code"
+            submitLabel="Activate Account"
+          />
+        </div>
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_ADMIN_PATHS = ["/admin/login"];
+const PUBLIC_ADMIN_PATHS = ["/admin/login", "/admin/forgot-password"];
 
 /**
  * Refreshes the Supabase session on every request and performs a first-pass

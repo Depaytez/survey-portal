@@ -7,6 +7,8 @@ import { BrandMark } from "@/components/brand-mark";
 const NAV_LINKS = [
   { href: "/admin/dashboard", label: "Dashboard" },
   { href: "/admin/surveys", label: "Surveys" },
+  { href: "/admin/customer-care", label: "Customer Care" },
+  { href: "/admin/stakeholder-requests", label: "Stakeholder Requests" },
   { href: "/admin/admins", label: "Admins" },
 ];
 

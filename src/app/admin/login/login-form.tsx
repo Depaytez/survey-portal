@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { signIn, type LoginActionState } from "./actions";
 import { inputClass, primaryButtonClass } from "@/lib/ui";
@@ -30,9 +31,17 @@ export function LoginForm({ redirectTo }: { redirectTo?: string }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="password" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-          Password
-        </label>
+        <div className="flex items-center justify-between">
+          <label htmlFor="password" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            Password
+          </label>
+          <Link
+            href="/admin/forgot-password"
+            className="text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+          >
+            Forgot password?
+          </Link>
+        </div>
         <input
           id="password"
           name="password"

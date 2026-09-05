@@ -38,12 +38,15 @@ export default async function AdminSurveysPage() {
                     <StatusBadge status={survey.status} />
                   </div>
                   <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">/{survey.slug}</p>
-                  <div className="mt-3 flex justify-between text-xs text-zinc-600 dark:text-zinc-400">
+                  <div className="mt-3 flex items-center justify-between text-xs text-zinc-600 dark:text-zinc-400">
                     <span>
                       {survey.responseCount} response{survey.responseCount === 1 ? "" : "s"}
                     </span>
                     <span>{new Date(survey.updatedAt).toLocaleDateString()}</span>
                   </div>
+                  <span className="mt-3 block text-right text-xs font-medium text-primary">
+                    Open →
+                  </span>
                 </Link>
               </li>
             ))}
@@ -58,6 +61,9 @@ export default async function AdminSurveysPage() {
                   <th className="px-4 py-3 font-medium">Status</th>
                   <th className="px-4 py-3 font-medium">Responses</th>
                   <th className="px-4 py-3 font-medium">Updated</th>
+                  <th className="px-4 py-3 font-medium">
+                    <span className="sr-only">Open</span>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
@@ -83,6 +89,14 @@ export default async function AdminSurveysPage() {
                     </td>
                     <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
                       {new Date(survey.updatedAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <Link
+                        href={`/admin/surveys/${survey.id}`}
+                        className="text-xs font-medium text-primary hover:underline"
+                      >
+                        Open →
+                      </Link>
                     </td>
                   </tr>
                 ))}

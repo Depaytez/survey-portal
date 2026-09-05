@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getDashboardStats, listSurveysForAdmin } from "@/lib/supabase/queries/survey-admin";
+import { getRequestCounts } from "@/lib/supabase/queries/requests";
 import { primaryButtonClass, secondaryButtonClass } from "@/lib/ui";
 import { StatusBadge } from "../surveys/status-badge";
 
@@ -15,7 +16,11 @@ function StatCard({ label, value }: { label: string; value: number }) {
 }
 
 export default async function AdminDashboardPage() {
-  const [stats, surveys] = await Promise.all([getDashboardStats(), listSurveysForAdmin()]);
+  const [stats, surveys, requestCounts] = await Promise.all([
+    getDashboardStats(),
+    listSurveysForAdmin(),
+    getRequestCounts(),
+  ]);
   const recentSurveys = surveys.slice(0, RECENT_SURVEYS_LIMIT);
 
   return (
@@ -103,6 +108,36 @@ export default async function AdminDashboardPage() {
             ))}
           </ul>
         )}
+      </div>
+
+      <div className="mt-8">
+        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Requests</h2>
+        <div className="mt-3 grid gap-4 sm:grid-cols-2">
+          <Link
+            href="/admin/customer-care"
+            className="flex items-center justify-between rounded-lg border border-zinc-200 bg-white p-5 transition-colors hover:bg-primary/5 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:bg-primary/10"
+          >
+            <div>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">Customer Care</p>
+              <p className="mt-1 text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
+                {requestCounts.customerCare} new
+              </p>
+            </div>
+            <span className="text-sm font-medium text-primary">View →</span>
+          </Link>
+          <Link
+            href="/admin/stakeholder-requests"
+            className="flex items-center justify-between rounded-lg border border-zinc-200 bg-white p-5 transition-colors hover:bg-primary/5 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:bg-primary/10"
+          >
+            <div>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">Stakeholder Requests</p>
+              <p className="mt-1 text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
+                {requestCounts.stakeholder} new
+              </p>
+            </div>
+            <span className="text-sm font-medium text-primary">View →</span>
+          </Link>
+        </div>
       </div>
 
       <div className="mt-8">

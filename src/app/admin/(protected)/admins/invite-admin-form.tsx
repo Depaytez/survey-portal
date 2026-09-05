@@ -28,7 +28,10 @@ export function InviteAdminForm() {
 
       {state.status === "success" ? (
         <p role="status" className="text-sm text-primary">
-          ✓ Invite sent — they&apos;ll get an email with a link to set their password.
+          {state.emailSent
+            ? "✓ Invite sent — they'll get an email with a link to set their password."
+            : "✓ That email already has an account — confirmed as an admin. No email was sent " +
+              "since they already have a password (nothing to set)."}
         </p>
       ) : null}
       {state.status === "error" ? (

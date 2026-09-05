@@ -9,6 +9,11 @@ import { inviteAdminSchema } from "@/lib/validation/admin-invite";
 export type InviteAdminState = {
   status: "idle" | "success" | "error";
   error?: string;
+  // Distinguishes "a real invite email was sent" from "that email already
+  // had an account — we just confirmed/updated their admin profile,
+  // nothing was emailed" so the UI never claims an email went out when it
+  // didn't.
+  emailSent?: boolean;
 };
 
 async function getOrigin(): Promise<string> {
@@ -47,6 +52,7 @@ export async function inviteAdmin(
 
   const existing = existingUsers.users.find((u) => u.email === parsed.data.email);
   let userId: string;
+  let emailSent = false;
 
   if (existing) {
     userId = existing.id;
@@ -62,6 +68,7 @@ export async function inviteAdmin(
     }
 
     userId = invited.user.id;
+    emailSent = true;
   }
 
   const { error: profileError } = await admin
@@ -70,9 +77,14 @@ export async function inviteAdmin(
 
   if (profileError) {
     console.error("Failed to create admin profile:", profileError.message);
-    return { status: "error", error: "Invite sent, but setting up the admin profile failed." };
+    return {
+      status: "error",
+      error: emailSent
+        ? "Invite email sent, but setting up the admin profile failed."
+        : "Something went wrong updating that admin's profile.",
+    };
   }
 
   revalidatePath("/admin/admins");
-  return { status: "success" };
+  return { status: "success", emailSent };
 }

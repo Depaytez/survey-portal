@@ -25,8 +25,23 @@ export default async function AdminsPage() {
         </h2>
         <ul className="mt-3 divide-y divide-zinc-200 rounded-lg border border-zinc-200 bg-white dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-950">
           {admins.map((admin) => (
-            <li key={admin.id} className="flex items-center justify-between px-4 py-3 text-sm">
-              <span className="text-zinc-900 dark:text-zinc-50">{admin.fullName}</span>
+            <li
+              key={admin.id}
+              className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-sm"
+            >
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-zinc-900 dark:text-zinc-50">
+                    {admin.fullName}
+                  </span>
+                  {admin.isPending ? (
+                    <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent">
+                      Invite pending
+                    </span>
+                  ) : null}
+                </div>
+                <span className="text-zinc-500 dark:text-zinc-400">{admin.email}</span>
+              </div>
               <span className="text-zinc-500 dark:text-zinc-400">
                 Added {new Date(admin.createdAt).toLocaleDateString()}
               </span>

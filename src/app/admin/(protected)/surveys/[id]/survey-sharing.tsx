@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { secondaryButtonClass } from "@/lib/ui";
+import { secondaryButtonClass, adminCardClass } from "@/lib/ui";
 
 export function SurveySharing({ slug }: { slug: string }) {
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
@@ -19,7 +19,7 @@ export function SurveySharing({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
+    <div className={adminCardClass}>
       <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Public Survey Link</p>
       <p className="mt-1 truncate text-sm text-zinc-500 dark:text-zinc-400">{path}</p>
       <div className="mt-4 flex flex-wrap items-center gap-3">

@@ -1,5 +1,7 @@
 import { listAdmins } from "@/lib/supabase/queries/admins";
 import { InviteAdminForm } from "./invite-admin-form";
+import { ResendInviteButton } from "./resend-invite-button";
+import { adminCardClass, dividedListClass } from "@/lib/ui";
 
 export default async function AdminsPage() {
   const admins = await listAdmins();
@@ -8,7 +10,7 @@ export default async function AdminsPage() {
     <div className="mx-auto max-w-2xl">
       <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Administrators</h1>
 
-      <div className="mt-6 rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
+      <div className={`mt-6 ${adminCardClass}`}>
         <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Invite an Admin</h2>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
           They&apos;ll receive an email with a link to set their own password — no password is
@@ -23,7 +25,7 @@ export default async function AdminsPage() {
         <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
           Current Administrators
         </h2>
-        <ul className="mt-3 divide-y divide-zinc-200 rounded-lg border border-zinc-200 bg-white dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-950">
+        <ul className={`mt-3 ${dividedListClass}`}>
           {admins.map((admin) => (
             <li
               key={admin.id}
@@ -42,9 +44,14 @@ export default async function AdminsPage() {
                 </div>
                 <span className="text-zinc-500 dark:text-zinc-400">{admin.email}</span>
               </div>
-              <span className="text-zinc-500 dark:text-zinc-400">
-                Added {new Date(admin.createdAt).toLocaleDateString()}
-              </span>
+              <div className="flex items-center gap-3">
+                {admin.isPending ? (
+                  <ResendInviteButton email={admin.email} />
+                ) : null}
+                <span className="text-zinc-500 dark:text-zinc-400">
+                  Added {new Date(admin.createdAt).toLocaleDateString()}
+                </span>
+              </div>
             </li>
           ))}
         </ul>

@@ -5,6 +5,8 @@ import {
   type ResponseSortColumn,
 } from "@/lib/supabase/queries/survey-analytics";
 import { getSurveyForAdmin } from "@/lib/supabase/queries/survey-admin";
+import { BackLink } from "@/components/back-link";
+import { emptyStateClass } from "@/lib/ui";
 
 const PAGE_SIZE = 25;
 const STATUS_FILTERS = ["SUBMITTED", "IN_PROGRESS", "ABANDONED"] as const;
@@ -56,12 +58,7 @@ export default async function SurveyResponsesPage({
 
   return (
     <div className="mx-auto max-w-4xl">
-      <Link
-        href={`/admin/surveys/${id}`}
-        className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
-      >
-        ← Back to {survey.title}
-      </Link>
+      <BackLink href={`/admin/surveys/${id}`}>Back to {survey.title}</BackLink>
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Responses</h1>
@@ -98,7 +95,7 @@ export default async function SurveyResponsesPage({
       </div>
 
       {responses.length === 0 ? (
-        <div className="mt-6 rounded-lg border border-dashed border-zinc-300 bg-white/60 p-8 text-center dark:border-zinc-700 dark:bg-zinc-950/60">
+        <div className={`mt-6 ${emptyStateClass}`}>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
             {status ? `No ${status.toLowerCase()} responses.` : "No responses yet."}
           </p>

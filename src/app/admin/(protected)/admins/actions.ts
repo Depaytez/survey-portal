@@ -1,26 +1,23 @@
 "use server";
 
-import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getRequestOrigin } from "@/lib/request-origin";
 import { inviteAdminSchema } from "@/lib/validation/admin-invite";
 
 export type InviteAdminState = {
   status: "idle" | "success" | "error";
   error?: string;
   // Distinguishes "a real invite email was sent" from "that email already
-  // had an account — we just confirmed/updated their admin profile,
-  // nothing was emailed" so the UI never claims an email went out when it
-  // didn't.
+  // had a confirmed account — we just confirmed/updated their admin
+  // profile, nothing was emailed" so the UI never claims an email went out
+  // when it didn't.
   emailSent?: boolean;
 };
 
-async function getOrigin(): Promise<string> {
-  const h = await headers();
-  const host = h.get("host");
-  const proto = h.get("x-forwarded-proto") ?? "http";
-  return `${proto}://${host}`;
+function inviteRedirectTo(origin: string): string {
+  return `${origin}/auth/callback?next=/admin/set-password`;
 }
 
 export async function inviteAdmin(
@@ -42,31 +39,40 @@ export async function inviteAdmin(
   }
 
   const admin = createAdminClient();
-  const origin = await getOrigin();
+  const origin = await getRequestOrigin();
 
-  const { data: existingUsers, error: listError } = await admin.auth.admin.listUsers();
-  if (listError) {
-    console.error("Failed to look up existing users:", listError.message);
-    return { status: "error", error: "Something went wrong. Please try again." };
-  }
+  // inviteUserByEmail is tried unconditionally first rather than
+  // pre-checking listUsers(): Supabase itself distinguishes the two cases
+  // that matter — a brand-new email or a still-pending (invited but never
+  // confirmed) one both succeed and (re)send the email, while an already
+  // *confirmed* admin's email comes back as the specific `email_exists`
+  // error. That's the only case where we skip sending anything.
+  const { data: invited, error: inviteError } = await admin.auth.admin.inviteUserByEmail(
+    parsed.data.email,
+    { redirectTo: inviteRedirectTo(origin) },
+  );
 
-  const existing = existingUsers.users.find((u) => u.email === parsed.data.email);
   let userId: string;
-  let emailSent = false;
+  let emailSent: boolean;
 
-  if (existing) {
-    userId = existing.id;
-  } else {
-    const { data: invited, error: inviteError } = await admin.auth.admin.inviteUserByEmail(
-      parsed.data.email,
-      { redirectTo: `${origin}/auth/callback?next=/admin/set-password` },
-    );
-
-    if (inviteError || !invited.user) {
-      console.error("Failed to invite admin:", inviteError?.message);
-      return { status: "error", error: inviteError?.message ?? "Failed to send the invite." };
+  if (inviteError) {
+    if (inviteError.code !== "email_exists") {
+      console.error("Failed to invite admin:", inviteError.message);
+      return { status: "error", error: inviteError.message };
     }
 
+    const { data: existingUsers, error: listError } = await admin.auth.admin.listUsers();
+    if (listError) {
+      console.error("Failed to look up existing user:", listError.message);
+      return { status: "error", error: "Something went wrong. Please try again." };
+    }
+    const existing = existingUsers.users.find((u) => u.email === parsed.data.email);
+    if (!existing) {
+      return { status: "error", error: "Something went wrong looking up that account." };
+    }
+    userId = existing.id;
+    emailSent = false;
+  } else {
     userId = invited.user.id;
     emailSent = true;
   }
@@ -87,4 +93,29 @@ export async function inviteAdmin(
 
   revalidatePath("/admin/admins");
   return { status: "success", emailSent };
+}
+
+export type ResendInviteState = { success: true } | { success: false; error: string };
+
+/**
+ * For a still-pending invitee only (see listAdmins' isPending). Calling
+ * inviteUserByEmail again on the same not-yet-confirmed address simply
+ * resends the invite — verified directly against Supabase, not assumed.
+ */
+export async function resendInvite(email: string): Promise<ResendInviteState> {
+  await requireAdmin();
+
+  const admin = createAdminClient();
+  const origin = await getRequestOrigin();
+
+  const { error } = await admin.auth.admin.inviteUserByEmail(email, {
+    redirectTo: inviteRedirectTo(origin),
+  });
+
+  if (error) {
+    console.error(`Failed to resend invite to ${email}:`, error.message);
+    return { success: false, error: error.message };
+  }
+
+  return { success: true };
 }

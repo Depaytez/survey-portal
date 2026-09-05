@@ -163,15 +163,40 @@ export function QuestionField({
       ) : null}
 
       {question.questionType === "boolean" ? (
-        <label className="flex cursor-pointer items-start gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={value === true}
-            onChange={(e) => onChange(e.target.checked)}
-            className="mt-0.5"
-          />
-          <span className="text-zinc-700 dark:text-zinc-300">I agree</span>
-        </label>
+        question.configuration.mustBeTrue === true ? (
+          <label className="flex cursor-pointer items-start gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={value === true}
+              onChange={(e) => onChange(e.target.checked)}
+              className="mt-0.5"
+            />
+            <span className="text-zinc-700 dark:text-zinc-300">I agree</span>
+          </label>
+        ) : (
+          <div className="flex gap-2">
+            {[
+              { label: "Yes", answer: true },
+              { label: "No", answer: false },
+            ].map((choice) => (
+              <label
+                key={choice.label}
+                className={`${optionCardClass} flex-1 justify-center text-center`}
+              >
+                <input
+                  type="radio"
+                  name={fieldId}
+                  checked={value === choice.answer}
+                  onChange={() => onChange(choice.answer)}
+                  className="sr-only"
+                />
+                <span className="font-medium text-zinc-900 dark:text-zinc-50">
+                  {choice.label}
+                </span>
+              </label>
+            ))}
+          </div>
+        )
       ) : null}
 
       {error ? (

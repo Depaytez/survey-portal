@@ -3,6 +3,7 @@ import { requestStatuses } from "@/lib/validation/requests";
 import { RequestStatusSelect } from "../request-status-select";
 import { updateCustomerCareStatus } from "./actions";
 import Link from "next/link";
+import { emptyStateClass } from "@/lib/ui";
 
 const CATEGORY_LABELS: Record<string, string> = {
   general: "General",
@@ -53,7 +54,7 @@ export default async function CustomerCarePage({
       </div>
 
       {requests.length === 0 ? (
-        <div className="mt-6 rounded-lg border border-dashed border-zinc-300 bg-white/60 p-8 text-center dark:border-zinc-700 dark:bg-zinc-950/60">
+        <div className={`mt-6 ${emptyStateClass}`}>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
             {status ? `No ${status.toLowerCase()} requests.` : "No requests yet."}
           </p>

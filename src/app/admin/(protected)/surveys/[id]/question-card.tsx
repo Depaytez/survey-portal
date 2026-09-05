@@ -28,17 +28,24 @@ function QuestionForm({
   sectionId,
   question,
   onDone,
+  hasResponses,
 }: {
   surveyId: string;
   sectionId: string;
   question?: SurveyQuestion;
   onDone: () => void;
+  hasResponses: boolean;
 }) {
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [type, setType] = useState<QuestionType>(
     (question?.questionType as QuestionType | undefined) ?? "short_text",
   );
+  // Changing an already-answered question's type would make its stored
+  // answers (shaped for the old type) nonsensical in analytics — only lock
+  // this for an existing question once the survey has responses; a
+  // brand-new question is unaffected.
+  const lockType = hasResponses && Boolean(question);
 
   async function handleSubmit(formData: FormData) {
     setIsPending(true);
@@ -75,7 +82,8 @@ function QuestionForm({
             name="questionType"
             value={type}
             onChange={(e) => setType(e.target.value as QuestionType)}
-            className={inputClass}
+            disabled={lockType}
+            className={`${inputClass} disabled:opacity-60`}
           >
             {questionTypes.map((t) => (
               <option key={t} value={t}>
@@ -83,6 +91,14 @@ function QuestionForm({
               </option>
             ))}
           </select>
+          {/* A disabled <select> submits nothing — this carries the locked
+              value through instead. */}
+          {lockType ? <input type="hidden" name="questionType" value={type} /> : null}
+          {lockType ? (
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              Type can&apos;t change once the survey has responses.
+            </p>
+          ) : null}
         </div>
       </div>
 
@@ -226,12 +242,14 @@ export function QuestionCard({
   question,
   isFirst,
   isLast,
+  hasResponses,
 }: {
   surveyId: string;
   sectionId: string;
   question: SurveyQuestion;
   isFirst: boolean;
   isLast: boolean;
+  hasResponses: boolean;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isAddingOption, setIsAddingOption] = useState(false);
@@ -244,6 +262,7 @@ export function QuestionCard({
         sectionId={sectionId}
         question={question}
         onDone={() => setIsEditing(false)}
+        hasResponses={hasResponses}
       />
     );
   }
@@ -255,7 +274,10 @@ export function QuestionCard({
   }
 
   async function handleDelete() {
-    if (!confirm(`Delete question "${question.title}"? This also deletes its options.`)) return;
+    const warning = hasResponses
+      ? ` This survey already has responses — deleting this question permanently removes any answers submitted for it. This can't be undone.`
+      : "";
+    if (!confirm(`Delete question "${question.title}"? This also deletes its options.${warning}`)) return;
     setIsPending(true);
     await deleteQuestion(surveyId, question.id);
     setIsPending(false);
@@ -316,6 +338,7 @@ export function QuestionCard({
               option={option}
               isFirst={index === 0}
               isLast={index === question.options.length - 1}
+              hasResponses={hasResponses}
             />
           ))}
           {isAddingOption ? (

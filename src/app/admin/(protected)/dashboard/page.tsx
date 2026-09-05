@@ -1,14 +1,15 @@
 import Link from "next/link";
 import { getDashboardStats, listSurveysForAdmin } from "@/lib/supabase/queries/survey-admin";
 import { getRequestCounts } from "@/lib/supabase/queries/requests";
-import { primaryButtonClass, secondaryButtonClass } from "@/lib/ui";
+import { VisualizeIcon } from "@/components/visualize-icon";
+import { primaryButtonClass, secondaryButtonClass, adminCardClass, emptyStateClass, dividedListClass } from "@/lib/ui";
 import { StatusBadge } from "../surveys/status-badge";
 
 const RECENT_SURVEYS_LIMIT = 5;
 
 function StatCard({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
+    <div className={adminCardClass}>
       <p className="text-sm text-zinc-500 dark:text-zinc-400">{label}</p>
       <p className="mt-1 text-3xl font-semibold text-zinc-900 dark:text-zinc-50">{value}</p>
     </div>
@@ -47,7 +48,7 @@ export default async function AdminDashboardPage() {
         </div>
 
         {recentSurveys.length === 0 ? (
-          <div className="mt-3 rounded-lg border border-dashed border-zinc-300 bg-white/60 p-6 text-center dark:border-zinc-700 dark:bg-zinc-950/60">
+          <div className={`mt-3 ${emptyStateClass}`}>
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
               No surveys yet.{" "}
               <Link href="/admin/surveys/new" className="font-medium text-primary underline">
@@ -57,7 +58,7 @@ export default async function AdminDashboardPage() {
             </p>
           </div>
         ) : (
-          <ul className="mt-3 divide-y divide-zinc-200 rounded-lg border border-zinc-200 bg-white dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-950">
+          <ul className={`mt-3 ${dividedListClass}`}>
             {recentSurveys.map((survey) => (
               <li key={survey.id} className="flex items-center justify-between gap-3 px-4 py-3">
                 <Link
@@ -73,6 +74,14 @@ export default async function AdminDashboardPage() {
                 </Link>
                 <div className="flex shrink-0 items-center gap-3">
                   <StatusBadge status={survey.status} />
+                  <Link
+                    href={`/admin/surveys/${survey.id}/analytics`}
+                    title="Visualize responses"
+                    className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                  >
+                    <VisualizeIcon />
+                    Visualize
+                  </Link>
                   <Link
                     href={`/admin/surveys/${survey.id}`}
                     className="text-xs font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
@@ -95,7 +104,7 @@ export default async function AdminDashboardPage() {
             No responses have been submitted yet.
           </p>
         ) : (
-          <ul className="mt-3 divide-y divide-zinc-200 rounded-lg border border-zinc-200 bg-white dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-950">
+          <ul className={`mt-3 ${dividedListClass}`}>
             {stats.recentResponses.map((response) => (
               <li key={response.id} className="flex items-center justify-between px-4 py-3 text-sm">
                 <span className="text-zinc-900 dark:text-zinc-50">{response.surveyTitle}</span>
@@ -115,7 +124,7 @@ export default async function AdminDashboardPage() {
         <div className="mt-3 grid gap-4 sm:grid-cols-2">
           <Link
             href="/admin/customer-care"
-            className="flex items-center justify-between rounded-lg border border-zinc-200 bg-white p-5 transition-colors hover:bg-primary/5 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:bg-primary/10"
+            className={`flex items-center justify-between transition-colors hover:bg-primary/5 dark:hover:bg-primary/10 ${adminCardClass}`}
           >
             <div>
               <p className="text-sm text-zinc-500 dark:text-zinc-400">Customer Care</p>
@@ -127,7 +136,7 @@ export default async function AdminDashboardPage() {
           </Link>
           <Link
             href="/admin/stakeholder-requests"
-            className="flex items-center justify-between rounded-lg border border-zinc-200 bg-white p-5 transition-colors hover:bg-primary/5 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:bg-primary/10"
+            className={`flex items-center justify-between transition-colors hover:bg-primary/5 dark:hover:bg-primary/10 ${adminCardClass}`}
           >
             <div>
               <p className="text-sm text-zinc-500 dark:text-zinc-400">Stakeholder Requests</p>

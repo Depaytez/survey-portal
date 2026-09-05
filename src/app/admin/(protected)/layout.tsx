@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/auth";
 import { signOut } from "../login/actions";
 import { SiteBackground } from "@/components/site-background";
 import { BrandMark } from "@/components/brand-mark";
+import { SkipToContent } from "@/components/skip-to-content";
 
 const NAV_LINKS = [
   { href: "/admin/dashboard", label: "Dashboard" },
@@ -21,6 +22,7 @@ export default async function ProtectedAdminLayout({
 
   return (
     <div className="relative min-h-screen">
+      <SkipToContent />
       <SiteBackground variant="admin" />
       <header className="sticky top-0 z-10 border-b border-zinc-200 bg-background dark:border-zinc-800">
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
@@ -51,7 +53,9 @@ export default async function ProtectedAdminLayout({
           ))}
         </nav>
       </header>
-      <main className="p-4 sm:p-6">{children}</main>
+      <main id="main-content" className="p-4 sm:p-6">
+        {children}
+      </main>
     </div>
   );
 }

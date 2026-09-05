@@ -1,8 +1,8 @@
 "use server";
 
-import { headers } from "next/headers";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { getRequestOrigin } from "@/lib/request-origin";
 import { isHoneypotTripped, isSubmittedTooFast } from "@/lib/spam-protection";
 
 export type ForgotPasswordState = {
@@ -11,13 +11,6 @@ export type ForgotPasswordState = {
 };
 
 const emailSchema = z.string().trim().min(1).email();
-
-async function getOrigin(): Promise<string> {
-  const h = await headers();
-  const host = h.get("host");
-  const proto = h.get("x-forwarded-proto") ?? "http";
-  return `${proto}://${host}`;
-}
 
 // Deliberately vague on success either way — confirming or denying that an
 // email belongs to an admin account would let someone enumerate admin
@@ -38,7 +31,7 @@ export async function requestPasswordReset(
     return { status: "error", error: "Enter a valid email address" };
   }
 
-  const origin = await getOrigin();
+  const origin = await getRequestOrigin();
   const supabase = await createClient();
 
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data, {

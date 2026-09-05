@@ -17,6 +17,11 @@ export function SurveyRunner({ survey }: { survey: SurveyDetail }) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  // Bot-resistance, same pattern as the contact/stakeholder-interest forms:
+  // a honeypot field real visitors never see, plus a minimum time between
+  // when the form rendered and when it's submitted.
+  const [renderedAt] = useState(() => Date.now());
+  const [website, setWebsite] = useState("");
 
   const sections = survey.sections;
   const currentSection = sections[stepIndex];
@@ -75,7 +80,7 @@ export function SurveyRunner({ survey }: { survey: SurveyDetail }) {
     if (!validateStep(stepIndex)) return;
 
     startTransition(async () => {
-      const result = await submitSurveyResponse(survey.slug, answers);
+      const result = await submitSurveyResponse(survey.slug, answers, { website, renderedAt });
       if (result.success) {
         setPhase("success");
         return;
@@ -168,6 +173,20 @@ export function SurveyRunner({ survey }: { survey: SurveyDetail }) {
             {currentSection.description}
           </p>
         ) : null}
+
+        {/* Honeypot: hidden from real visitors, invisible to assistive tech, never reached by keyboard. Bots that fill every field trip it. */}
+        <div aria-hidden="true" className="sr-only">
+          <label htmlFor="website">Website</label>
+          <input
+            id="website"
+            name="website"
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+          />
+        </div>
 
         <div className="mt-6 flex flex-col gap-8">
           {currentSection.questions.map((question) => (

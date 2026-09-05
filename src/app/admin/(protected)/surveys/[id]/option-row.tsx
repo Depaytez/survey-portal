@@ -10,11 +10,13 @@ function OptionForm({
   questionId,
   option,
   onDone,
+  lockValue = false,
 }: {
   surveyId: string;
   questionId: string;
   option?: SurveyOption;
   onDone: () => void;
+  lockValue?: boolean;
 }) {
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
@@ -33,13 +35,21 @@ function OptionForm({
   return (
     <form action={handleSubmit} className="flex flex-col gap-2 rounded-md border border-zinc-200 p-3 dark:border-zinc-700">
       <div className="grid gap-2 sm:grid-cols-2">
-        <input
-          name="value"
-          placeholder="value (e.g. option_a)"
-          defaultValue={option?.value}
-          required
-          className={inputClass}
-        />
+        <div>
+          <input
+            name="value"
+            placeholder="value (e.g. option_a)"
+            defaultValue={option?.value}
+            required
+            readOnly={lockValue}
+            className={`${inputClass} ${lockValue ? "opacity-60" : ""}`}
+          />
+          {lockValue ? (
+            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+              Can&apos;t change once answered — it&apos;s how past responses are matched.
+            </p>
+          ) : null}
+        </div>
         <input
           name="label"
           placeholder="Label shown to respondents"
@@ -77,12 +87,14 @@ export function OptionRow({
   option,
   isFirst,
   isLast,
+  hasResponses,
 }: {
   surveyId: string;
   questionId: string;
   option: SurveyOption;
   isFirst: boolean;
   isLast: boolean;
+  hasResponses: boolean;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isPending, setIsPending] = useState(false);
@@ -94,6 +106,7 @@ export function OptionRow({
         questionId={questionId}
         option={option}
         onDone={() => setIsEditing(false)}
+        lockValue={hasResponses}
       />
     );
   }
@@ -105,7 +118,10 @@ export function OptionRow({
   }
 
   async function handleDelete() {
-    if (!confirm(`Delete option "${option.label}"?`)) return;
+    const warning = hasResponses
+      ? ` This survey already has responses — some may have used this option, and they'll no longer show up correctly in analytics. This can't be undone.`
+      : "";
+    if (!confirm(`Delete option "${option.label}"?${warning}`)) return;
     setIsPending(true);
     await deleteOption(surveyId, option.id);
     setIsPending(false);

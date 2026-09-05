@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getResponseDetail } from "@/lib/supabase/queries/survey-analytics";
+import { BackLink } from "@/components/back-link";
+import { adminCardClass } from "@/lib/ui";
 
 function formatAnswerValue(value: unknown): string {
   if (value === null || value === undefined) return "—";
@@ -31,14 +32,9 @@ export default async function ResponseDetailPage({
 
   return (
     <div className="mx-auto max-w-2xl">
-      <Link
-        href={`/admin/surveys/${id}/responses`}
-        className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
-      >
-        ← Back to Responses
-      </Link>
+      <BackLink href={`/admin/surveys/${id}/responses`}>Back to Responses</BackLink>
 
-      <div className="mt-3 rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
+      <div className={`mt-3 ${adminCardClass}`}>
         <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
           Response — {response.surveyTitle}
         </h1>
@@ -66,7 +62,7 @@ export default async function ResponseDetailPage({
         {Array.from(sections.entries()).map(([sectionTitle, answers]) => (
           <div
             key={sectionTitle}
-            className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950"
+            className={adminCardClass}
           >
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
               {sectionTitle}

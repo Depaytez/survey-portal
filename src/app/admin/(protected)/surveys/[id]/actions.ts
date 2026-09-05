@@ -26,6 +26,25 @@ function revalidateSurvey(surveyId: string) {
   revalidatePath("/admin/surveys");
 }
 
+/**
+ * Real enforcement behind the builder UI's disabled type-select /
+ * read-only option-value field — those are just the honest reflection of
+ * this in the UI, not the actual guard. Without this, a request crafted
+ * outside the browser (or a future UI regression) could still silently
+ * repurpose an already-answered question/option and corrupt analytics.
+ */
+async function surveyHasResponses(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  surveyId: string,
+): Promise<boolean> {
+  const { count } = await supabase
+    .from("survey_responses")
+    .select("id", { count: "exact", head: true })
+    .eq("survey_id", surveyId)
+    .eq("status", "SUBMITTED");
+  return (count ?? 0) > 0;
+}
+
 // ---------------------------------------------------------------------
 // Survey details + status
 // ---------------------------------------------------------------------
@@ -297,6 +316,21 @@ export async function updateQuestion(
   if (!parsed.success) return fail(parsed.error);
 
   const supabase = await createClient();
+
+  const { data: current } = await supabase
+    .from("questions")
+    .select("question_type")
+    .eq("id", questionId)
+    .single();
+
+  if (current && current.question_type !== parsed.data.questionType) {
+    if (await surveyHasResponses(supabase, surveyId)) {
+      return fail(
+        "This survey already has responses, so this question's type can't change — add a new question instead.",
+      );
+    }
+  }
+
   const { error } = await supabase
     .from("questions")
     .update({
@@ -428,6 +462,21 @@ export async function updateOption(
   if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? "Invalid input");
 
   const supabase = await createClient();
+
+  const { data: current } = await supabase
+    .from("question_options")
+    .select("value")
+    .eq("id", optionId)
+    .single();
+
+  if (current && current.value !== parsed.data.value) {
+    if (await surveyHasResponses(supabase, surveyId)) {
+      return fail(
+        "This survey already has responses, so this option's value can't change — past answers are matched by it.",
+      );
+    }
+  }
+
   const { error } = await supabase
     .from("question_options")
     .update({

@@ -5,15 +5,24 @@ const MIN_SUBMIT_TIME_MS = 800;
 const COOLDOWN_MINUTES = 5;
 
 /** A hidden field real visitors never see or fill; bots that fill every field trip it. */
-export function isHoneypotTripped(formData: FormData): boolean {
-  return Boolean(formData.get("website"));
+export function isHoneypotValueTripped(value: unknown): boolean {
+  return Boolean(value);
 }
 
 /** Rejects submissions faster than a human could plausibly fill the form. */
+export function isRenderedAtTooRecent(renderedAt: unknown): boolean {
+  const ms = Number(renderedAt);
+  if (!Number.isFinite(ms)) return true;
+  return Date.now() - ms < MIN_SUBMIT_TIME_MS;
+}
+
+/** FormData-based forms (contact, stakeholder-interest): same two checks, read from the raw submission. */
+export function isHoneypotTripped(formData: FormData): boolean {
+  return isHoneypotValueTripped(formData.get("website"));
+}
+
 export function isSubmittedTooFast(formData: FormData): boolean {
-  const renderedAt = Number(formData.get("renderedAt"));
-  if (!Number.isFinite(renderedAt)) return true;
-  return Date.now() - renderedAt < MIN_SUBMIT_TIME_MS;
+  return isRenderedAtTooRecent(formData.get("renderedAt"));
 }
 
 /**

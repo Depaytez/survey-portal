@@ -20,8 +20,8 @@ export default async function SurveyPage({ params }: PageProps<"/survey/[slug]">
     notFound();
   }
 
-  if (survey.status === "CLOSED") {
-    return <SurveyClosed title={survey.title} />;
+  if (survey.status === "CLOSED" || survey.status === "ARCHIVED") {
+    return <SurveyClosed title={survey.title} status={survey.status} />;
   }
 
   return <SurveyRunner survey={survey} />;

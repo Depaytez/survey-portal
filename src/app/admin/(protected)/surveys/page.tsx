@@ -1,20 +1,8 @@
 import Link from "next/link";
 import { listSurveysForAdmin } from "@/lib/supabase/queries/survey-admin";
 import { StatusBadge } from "./status-badge";
-import { primaryButtonClass, iconButtonClass } from "@/lib/ui";
-
-function VisualizeIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className="h-4 w-4">
-      <path
-        d="M4 15.5V8M10 15.5V4.5M16 15.5v-5"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
+import { VisualizeIcon } from "@/components/visualize-icon";
+import { primaryButtonClass, iconButtonClass, emptyStateClass } from "@/lib/ui";
 
 export default async function AdminSurveysPage() {
   const surveys = await listSurveysForAdmin();
@@ -29,7 +17,7 @@ export default async function AdminSurveysPage() {
       </div>
 
       {surveys.length === 0 ? (
-        <div className="mt-6 rounded-lg border border-dashed border-zinc-300 bg-white/60 p-8 text-center dark:border-zinc-700 dark:bg-zinc-950/60">
+        <div className={`mt-6 ${emptyStateClass}`}>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
             No surveys yet. Create one to get started.
           </p>

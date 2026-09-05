@@ -3,6 +3,7 @@ import { listStakeholderRequests } from "@/lib/supabase/queries/requests";
 import { requestStatuses } from "@/lib/validation/requests";
 import { RequestStatusSelect } from "../request-status-select";
 import { updateStakeholderStatus } from "./actions";
+import { emptyStateClass } from "@/lib/ui";
 
 const INTEREST_LABELS: Record<string, string> = {
   tourism_development_partnership: "Tourism Development Partnership",
@@ -54,7 +55,7 @@ export default async function StakeholderRequestsPage({
       </div>
 
       {requests.length === 0 ? (
-        <div className="mt-6 rounded-lg border border-dashed border-zinc-300 bg-white/60 p-8 text-center dark:border-zinc-700 dark:bg-zinc-950/60">
+        <div className={`mt-6 ${emptyStateClass}`}>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
             {status ? `No ${status.toLowerCase()} requests.` : "No requests yet."}
           </p>

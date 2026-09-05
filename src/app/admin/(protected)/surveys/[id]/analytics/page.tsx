@@ -10,7 +10,8 @@ import {
 import { TrendChart } from "./trend-chart";
 import { DistributionChart } from "./distribution-chart";
 import { SurveySharing } from "../survey-sharing";
-import { secondaryButtonClass } from "@/lib/ui";
+import { BackLink } from "@/components/back-link";
+import { secondaryButtonClass, adminCardClass, emptyStateClass } from "@/lib/ui";
 
 const TEXT_PAGE_SIZE = 5;
 const TEXT_QUESTION_TYPES = new Set(["short_text", "long_text", "email"]);
@@ -55,7 +56,7 @@ function relativeTime(iso: string | null): string {
 
 function KpiCard({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
+    <div className={`${adminCardClass} p-4`}>
       <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{label}</p>
       <p className="mt-1 text-2xl font-semibold text-zinc-900 dark:text-zinc-50">{value}</p>
     </div>
@@ -83,14 +84,9 @@ export default async function SurveyAnalyticsPage({
   if (survey.responseCount === 0) {
     return (
       <div className="mx-auto max-w-3xl">
-        <Link
-          href={`/admin/surveys/${id}`}
-          className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
-        >
-          ← Back to {survey.title}
-        </Link>
+        <BackLink href={`/admin/surveys/${id}`}>Back to {survey.title}</BackLink>
         <h1 className="mt-3 text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Analytics</h1>
-        <div className="mt-6 rounded-lg border border-dashed border-zinc-300 bg-white/60 p-8 text-center dark:border-zinc-700 dark:bg-zinc-950/60">
+        <div className={`mt-6 ${emptyStateClass}`}>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
             No responses yet — share the survey to start collecting data.
           </p>
@@ -126,12 +122,7 @@ export default async function SurveyAnalyticsPage({
   return (
     <div className="mx-auto max-w-3xl">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Link
-          href={`/admin/surveys/${id}`}
-          className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
-        >
-          ← Back to {survey.title}
-        </Link>
+        <BackLink href={`/admin/surveys/${id}`}>Back to {survey.title}</BackLink>
         <a href={`/admin/surveys/${id}/analytics/export`} className={`${secondaryButtonClass} px-3 py-1.5 text-xs`}>
           Download CSV
         </a>
@@ -148,7 +139,7 @@ export default async function SurveyAnalyticsPage({
       </div>
 
       {/* Trend */}
-      <div className="mt-6 rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
+      <div className={`mt-6 ${adminCardClass}`}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Responses Over Time</h2>
           <div className="flex flex-wrap gap-1">
@@ -187,10 +178,7 @@ export default async function SurveyAnalyticsPage({
                   const textAnswers = textAnswersById.get(q.id);
 
                   return (
-                    <div
-                      key={q.id}
-                      className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950"
-                    >
+                    <div key={q.id} className={adminCardClass}>
                       <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
                         {q.title}
                       </h3>

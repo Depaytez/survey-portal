@@ -68,6 +68,7 @@ export function SectionCard({
   isLast,
   isExpanded,
   onToggleExpanded,
+  hasResponses,
 }: {
   surveyId: string;
   section: SurveySection;
@@ -75,6 +76,7 @@ export function SectionCard({
   isLast: boolean;
   isExpanded: boolean;
   onToggleExpanded: () => void;
+  hasResponses: boolean;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isAddingQuestion, setIsAddingQuestion] = useState(false);
@@ -91,9 +93,12 @@ export function SectionCard({
   }
 
   async function handleDelete() {
+    const warning = hasResponses
+      ? ` This survey already has responses — deleting this section permanently removes any answers submitted for its questions. This can't be undone.`
+      : "";
     if (
       !confirm(
-        `Delete section "${section.title}"? This also deletes its ${section.questions.length} question(s) and their options.`,
+        `Delete section "${section.title}"? This also deletes its ${section.questions.length} question(s) and their options.${warning}`,
       )
     )
       return;
@@ -170,6 +175,7 @@ export function SectionCard({
                 question={question}
                 isFirst={index === 0}
                 isLast={index === section.questions.length - 1}
+                hasResponses={hasResponses}
               />
             ))}
           </div>
@@ -180,6 +186,7 @@ export function SectionCard({
                 surveyId={surveyId}
                 sectionId={section.id}
                 onDone={() => setIsAddingQuestion(false)}
+                hasResponses={hasResponses}
               />
             ) : (
               <button type="button" onClick={() => setIsAddingQuestion(true)} className={iconButtonClass}>

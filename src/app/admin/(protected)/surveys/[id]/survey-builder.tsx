@@ -19,6 +19,7 @@ export function SurveyBuilder({ survey }: { survey: AdminSurveyDetail }) {
   }
 
   const allCollapsed = survey.sections.length > 0 && collapsedIds.size === survey.sections.length;
+  const hasResponses = survey.responseCount > 0;
 
   return (
     <div>
@@ -41,6 +42,15 @@ export function SurveyBuilder({ survey }: { survey: AdminSurveyDetail }) {
         ) : null}
       </div>
 
+      {hasResponses ? (
+        <p className="mt-3 rounded-md bg-accent/10 px-3 py-2 text-xs text-accent">
+          This survey already has {survey.responseCount} response
+          {survey.responseCount === 1 ? "" : "s"}. Deleting a question or option removes any
+          answers already submitted for it, and a question&apos;s type can no longer be changed —
+          add new questions instead of repurposing existing ones.
+        </p>
+      ) : null}
+
       {survey.sections.length === 0 && !isAddingSection ? (
         <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
           No sections yet. Add one to start building the questionnaire.
@@ -57,6 +67,7 @@ export function SurveyBuilder({ survey }: { survey: AdminSurveyDetail }) {
             isLast={index === survey.sections.length - 1}
             isExpanded={!collapsedIds.has(section.id)}
             onToggleExpanded={() => toggleSection(section.id)}
+            hasResponses={hasResponses}
           />
         ))}
       </div>

@@ -33,3 +33,18 @@ export const inputClass =
 // directly on unpredictable image content.
 export const panelClass =
   "rounded-lg border border-zinc-200 bg-background/90 p-8 shadow-sm backdrop-blur-sm dark:border-zinc-800";
+
+// The admin tool's standard white card — was hand-typed identically across
+// 7+ admin pages before being centralized here.
+export const adminCardClass =
+  "rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950";
+
+// "Nothing here yet" placeholder, used wherever a list can legitimately be
+// empty (no surveys, no responses, no requests).
+export const emptyStateClass =
+  "rounded-lg border border-dashed border-zinc-300 bg-white/60 p-8 text-center dark:border-zinc-700 dark:bg-zinc-950/60";
+
+// A simple bordered list of rows (survey list, dashboard's recent items),
+// each row separated by a divider rather than its own card.
+export const dividedListClass =
+  "divide-y divide-zinc-200 rounded-lg border border-zinc-200 bg-white dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-950";

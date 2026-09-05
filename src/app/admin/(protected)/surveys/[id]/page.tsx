@@ -6,7 +6,8 @@ import { SurveySharing } from "./survey-sharing";
 import { SurveyStatusControl } from "./survey-status-control";
 import { SurveyDetailsForm } from "./survey-details-form";
 import { SurveyBuilder } from "./survey-builder";
-import { secondaryButtonClass } from "@/lib/ui";
+import { BackLink } from "@/components/back-link";
+import { secondaryButtonClass, adminCardClass } from "@/lib/ui";
 
 export default async function AdminSurveyDetailPage({
   params,
@@ -22,16 +23,11 @@ export default async function AdminSurveyDetailPage({
 
   return (
     <div className="mx-auto max-w-3xl">
-      <Link
-        href="/admin/surveys"
-        className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
-      >
-        ← Back to Surveys
-      </Link>
+      <BackLink href="/admin/surveys">Back to Surveys</BackLink>
 
       {/* Solid card, not the ambient background — StatusBadge's tinted fill
           only guarantees WCAG contrast against an opaque surface. */}
-      <div className="mt-3 rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
+      <div className={`mt-3 ${adminCardClass}`}>
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">{survey.title}</h1>
           <StatusBadge status={survey.status} />
@@ -62,7 +58,7 @@ export default async function AdminSurveyDetailPage({
         <SurveySharing slug={survey.slug} />
       </div>
 
-      <div className="mt-8 rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
+      <div className={`mt-8 ${adminCardClass}`}>
         <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Survey Details</h2>
         <div className="mt-4">
           <SurveyDetailsForm survey={survey} />

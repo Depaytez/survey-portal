@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { updateSurveyStatus } from "./actions";
 import { ALLOWED_STATUS_TRANSITIONS, type SurveyStatus } from "@/lib/validation/survey-admin";
 import { StatusBadge } from "../status-badge";
-import { primaryButtonClass, secondaryButtonClass } from "@/lib/ui";
+import { primaryButtonClass, secondaryButtonClass, adminCardClass } from "@/lib/ui";
 
 const TRANSITION_LABELS: Record<SurveyStatus, string> = {
   DRAFT: "Move to Draft",
@@ -54,7 +54,7 @@ export function SurveyStatusControl({
   }
 
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
+    <div className={adminCardClass}>
       <div className="flex items-center gap-3">
         <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Status</p>
         <StatusBadge status={status} />

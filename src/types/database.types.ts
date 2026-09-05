@@ -469,6 +469,10 @@ export type Database = {
           response_count: number
         }[]
       }
+      submit_survey_response: {
+        Args: { p_answers: Json; p_response_id: string; p_survey_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
